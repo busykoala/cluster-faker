@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Download istio
+      get_url:
+        url: https://raw.githubusercontent.com/istio/istio/master/release/downloadIstioCandidate.sh
+        dest: /home/vagrant/downloadIstio.sh
+        mode: 0755
+
+    - name: Install istio
+      shell: "/home/vagrant/downloadIstio.sh && rm /home/vagrant/downloadIstio.sh"
+      environment:
+        ISTIO_VERSION: "{{ istio_version }}"
+        TARGET_ARCH: x86_64

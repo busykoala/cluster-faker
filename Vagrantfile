@@ -16,10 +16,18 @@ Vagrant.configure("2") do |config|
         master.vm.box = IMAGE_NAME
         master.vm.network "private_network", ip: "192.168.50.10"
         master.vm.hostname = "k8s-master"
-        master.vm.provision "ansible" do |ansible|
+
+        master.vm.provision "setup-k8s", type: "ansible" do |ansible|
           ansible.playbook = "kubernetes-setup/master-playbook.yaml"
           ansible.extra_vars = {
             node_ip: "192.168.50.10",
+          }
+        end
+
+        master.vm.provision "setup-istio", type: "ansible" do |ansible|
+          ansible.playbook = "kubernetes-setup/istio/setup-istio.yaml"
+          ansible.extra_vars = {
+            istio_version: "1.9.3",
           }
         end
     end
@@ -29,12 +37,14 @@ Vagrant.configure("2") do |config|
             node.vm.box = IMAGE_NAME
             node.vm.network "private_network", ip: "192.168.50.#{i + 10}"
             node.vm.hostname = "node-#{i}"
-            node.vm.provision "ansible" do |ansible|
+
+            node.vm.provision "setup-k8s", type: "ansible" do |ansible|
               ansible.playbook = "kubernetes-setup/node-playbook.yaml"
               ansible.extra_vars = {
                 node_ip: "192.168.50.#{i + 10}",
               }
             end
+
         end
     end
 end
