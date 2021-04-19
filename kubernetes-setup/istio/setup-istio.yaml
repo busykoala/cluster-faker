@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  become: true
   tasks:
     - name: Download istio
       get_url:
@@ -13,3 +12,9 @@
       environment:
         ISTIO_VERSION: "{{ istio_version }}"
         TARGET_ARCH: x86_64
+
+    - name: Apply istio demo profile
+      shell: "/home/vagrant/istio-{{ istio_version }}/bin/istioctl install --set profile=demo -y"
+
+    - name: Apply istio demo profile
+      shell: "kubectl label namespace default istio-injection=enabled"
